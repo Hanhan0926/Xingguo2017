@@ -1,0 +1,25 @@
+---
+title: "Exercise 1"
+author: "Xingguo Han"
+date: "24 September 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Get a random log-normal distribution 
+
+Here, we sample 100 points from the log-normal distribution
+```{r sample}
+x<- rlnorm(100, log(1), log(2.5))
+```
+
+## A histogram
+
+Here is the code to generate a histogram
+
+```{r pressure}
+plot(pressure,log="y")
+```
