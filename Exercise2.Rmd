@@ -1,0 +1,98 @@
+---
+title: "Exercise 2"
+author: "Xingguo Han"
+date: "01 10 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exploratory Data Analysis
+
+Do an exploratory data analysis of a matrix of expression values. Load the data and display:
+* distributions: *boxplot*, *density*, *limma::plotDensities*
+* normalization: *limma::normalizeQuantiles*
+* clustering: *hclust*
+* heatmap: *heatmap.2* or *pheatmap*
+* correlation matrix: *cor* and *image*
+* reduced dimensionality representation: *cmdscale* and *prcomp*
+
+## Data Import
+```{r }
+anno = read.table("SampleAnnotation.txt", as.is=TRUE, sep="\t", quote="",
+                  row.names=1, header=TRUE)
+x = read.table("expressiondata.txt", as.is=TRUE, sep="\t", quote="", row.names=1, header=TRUE, check.names = FALSE)
+x = as.matrix(x)
+```
+## Required Libraries
+```{r}
+library(limma)
+library(gplots)
+library(pheatmap)
+library(corrplot)
+```
+
+## limma installation
+```{r}
+## try http:// if https:// URLs are not supported
+source("https://bioconductor.org/biocLite.R")
+biocLite("limma")
+```
+
+
+## Define samples and colors and phenotype
+```{r}
+samples = rownames(anno)
+colors = rainbow(nrow(anno))
+isNorm = anno$TissueType == "norm"
+isSick = anno$TissueType == "sick"
+isAcute = anno$TissueType == "acute"
+```
+
+## Data Normalization
+```{r}
+norm_x=normalizeQuantiles(x,ties=TRUE)
+```
+
+## Distribution
+```{r}
+##boxplot
+boxplot(x,main='Boxplot') 
+
+##density distribution
+plot(density(x),col=colors[1],main='Density Distribution')
+
+##limma::plotDensities
+plotDensities(norm_x,main='Limma Density',col=colors,legend=FALSE)
+```
+
+
+## Clustering
+```{r}
+plot(hclust(dist(c(1:17)), method = "ward.D"))
+```
+
+## Heatmap
+```{r}
+pheatmap(norm_x,dendrogram="col")
+annotation<-data.frame(condition=c(rep('isNorm',6),rep('isSick',5),rep('isAcute',6)))
+pheatmap(as.data.frame(x),annotation=annotation,cluster_rows=F,scale='column')
+```
+
+## correlation matrix
+```{r}
+cor_matrix=cor(norm_x)
+corrplot(cor_matrix,type="upper",title='Correlation Matrix')
+```
+
+## Reduced Dimensionality Representation
+```{r}
+cmds_x=cmdscale(dist(norm_x))
+plot(cmds_x,main='Reduced Dimensionality')
+
+## Principal Component Analysis
+pca_x<-prcomp(norm_x,scale=FALSE)
+```
+
